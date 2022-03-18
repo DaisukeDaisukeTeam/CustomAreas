@@ -4,7 +4,7 @@ namespace CustomAreas;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 
 class Main extends PluginBase{
@@ -28,7 +28,7 @@ class Main extends PluginBase{
 	public function onEnable() : void{
 		$this->saveDefaultConfig();
 		if(file_exists($this->getDataFolder().'areas.json')){
-			$areasData = json_decode(file_get_contents($this->getDataFolder().'areas.json'), true);
+			$areasData = json_decode(file_get_contents($this->getDataFolder().'areas.json'), true, 512, JSON_THROW_ON_ERROR);
 			foreach($areasData as $area){
 				$this->areas[] = new Area($this, $area['pos1'], $area['pos2'], $area['level'], $area['owner'], $area['whiteList']);
 			}
@@ -54,26 +54,27 @@ class Main extends PluginBase{
 			$sender->sendMessage($command->getUsage());
 			return true;
 		}
+		$position = $sender->getPosition();
 		switch(strtolower(array_shift($args))){
 			case 'pos1':
 				foreach($this->areas as $area){
-					if($area->isInside($sender)){
+					if($area->isInside($position)){
 						$sender->sendMessage($this->getConfig()->get('position-conflict'));
 						return true;
 					}
 				}
-				$this->selections[$sender->getName()]['pos1'] = [$sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), $sender->getLevel()->getName()];
+				$this->selections[$sender->getName()]['pos1'] = [$position->getFloorX(), $position->getFloorY(), $position->getFloorZ(), $sender->getWorld()->getFolderName()];
 				$sender->sendMessage($this->getConfig()->get('pos1-set'));
 				return true;
 			break;
 			case 'pos2':
 				foreach($this->areas as $area){
-					if($area->isInside($sender)){
+					if($area->isInside($position)){
 						$sender->sendMessage($this->getConfig()->get('position-conflict'));
 						return true;
 					}
 				}
-				$this->selections[$sender->getName()]['pos2'] = [$sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), $sender->getLevel()->getName()];
+				$this->selections[$sender->getName()]['pos2'] = [$position->getFloorX(), $position->getFloorY(), $position->getFloorZ(), $sender->getWorld()->getFolderName()];
 				$sender->sendMessage($this->getConfig()->get('pos2-set'));
 				return true;
 			break;
@@ -106,7 +107,7 @@ class Main extends PluginBase{
 			case 'delete':
 				$name = strtolower($sender->getName());
 				foreach($this->areas as $key => $area){
-					if($area->isInside($sender)){
+					if($area->isInside($position)){
 						if($area->owner !== $name && !$sender->hasPermission('customareas.bypass')){
 							$sender->sendMessage($this->getConfig()->get('not-owner'));
 							return true;
@@ -131,7 +132,7 @@ class Main extends PluginBase{
 						}
 						$name = strtolower($sender->getName());
 						foreach($this->areas as $key => $area){
-							if($area->isInside($sender)){
+							if($area->isInside($position)){
 								if($area->owner !== $name && !$sender->hasPermission('customareas.bypass')){
 									$sender->sendMessage($this->getConfig()->get('not-owner'));
 									return true;
@@ -153,7 +154,7 @@ class Main extends PluginBase{
 						}
 						$name = strtolower($sender->getName());
 						foreach($this->areas as $key => $area){
-							if($area->isInside($sender)){
+							if($area->isInside($position)){
 								if($area->owner !== $name && !$sender->hasPermission('customareas.bypass')){
 									$sender->sendMessage($this->getConfig()->get('not-owner'));
 									return true;
@@ -173,7 +174,7 @@ class Main extends PluginBase{
 					case 'list':
 						$name = strtolower($sender->getName());
 						foreach($this->areas as $key => $area){
-							if($area->isInside($sender)){
+							if($area->isInside($position)){
 								if($area->owner !== $name && !$sender->hasPermission('customareas.bypass')){
 									$sender->sendMessage($this->getConfig()->get('not-owner'));
 									return true;
@@ -200,7 +201,7 @@ class Main extends PluginBase{
 
 	private function tooManyAreas(Player $sender) : bool{
 		$count = 1;
-		$name = $sender->getLowerCaseName();
+		$name = strtolower($sender->getName());
 		foreach($this->areas as $area){
 			if($area->owner === $name){
 				++$count;

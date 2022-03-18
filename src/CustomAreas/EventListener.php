@@ -18,8 +18,8 @@ class EventListener implements Listener{
 	public function onPlace(BlockPlaceEvent $event) : void{
 		if(!$event->getPlayer()->hasPermission('customareas.bypass')){
 			foreach($this->plugin->areas as $area){
-				if($area->isInside($event->getBlock()) && !$area->canBuild($event->getPlayer())){
-					$event->setCancelled();
+				if($area->isInside($event->getBlock()->getPosition()) && !$area->canBuild($event->getPlayer())){
+					$event->cancel();
 					$event->getPlayer()->sendMessage(str_replace('{owner}', $area->owner, $this->plugin->getConfig()->get('notice')));
 				}
 			}
@@ -29,8 +29,8 @@ class EventListener implements Listener{
 	public function onBreak(BlockBreakEvent $event) : void{
 		if(!$event->getPlayer()->hasPermission('customareas.bypass')){
 			foreach($this->plugin->areas as $area){
-				if($area->isInside($event->getBlock()) && !$area->canBuild($event->getPlayer())){
-					$event->setCancelled();
+				if($area->isInside($event->getBlock()->getPosition()) && !$area->canBuild($event->getPlayer())){
+					$event->cancel();
 					$event->getPlayer()->sendMessage(str_replace('{owner}', $area->owner, $this->plugin->getConfig()->get('notice')));
 				}
 			}
@@ -40,8 +40,8 @@ class EventListener implements Listener{
 	public function onInteract(PlayerInteractEvent $event) : void{
 		if(!$event->getPlayer()->hasPermission('customareas.bypass')){
 			foreach($this->plugin->areas as $area){
-				if($area->isInside($event->getBlock()) && !$area->canBuild($event->getPlayer())){
-					$event->setCancelled();
+				if($area->isInside($event->getBlock()->getPosition()) && !$area->canBuild($event->getPlayer())){
+					$event->cancel();
 					$event->getPlayer()->sendMessage(str_replace('{owner}', $area->owner, $this->plugin->getConfig()->get('notice')));
 				}
 			}

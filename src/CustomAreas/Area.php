@@ -2,8 +2,9 @@
 
 namespace CustomAreas;
 
-use pocketmine\level\Position;
-use pocketmine\Player;
+
+use pocketmine\player\Player;
+use pocketmine\world\Position;
 
 class Area{
 
@@ -19,11 +20,11 @@ class Area{
 	}
 
 	public function isInside(Position $p) : bool{
-		return strtolower($p->getLevel()->getName()) === $this->level && $p->x >= $this->min[0] && $p->x <= $this->max[0] && $p->y >= $this->min[1] && $p->y <= $this->max[1] && $p->z >= $this->min[2] && $p->z <= $this->max[2];
+		return strtolower($p->getWorld()->getFolderName()) === $this->level && $p->x >= $this->min[0] && $p->x <= $this->max[0] && $p->y >= $this->min[1] && $p->y <= $this->max[1] && $p->z >= $this->min[2] && $p->z <= $this->max[2];
 	}
 
 	public function canBuild(Player $player) : bool{
-		return $player->getLowerCaseName() === $this->owner || in_array($player->getLowerCaseName(), $this->whiteList, true);
+		return strtolower($player->getName()) === $this->owner || in_array(strtolower($player->getName()), $this->whiteList, true);
 	}
 
 }
