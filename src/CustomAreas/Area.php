@@ -2,7 +2,6 @@
 
 namespace CustomAreas;
 
-
 use pocketmine\player\Player;
 use pocketmine\world\Position;
 
